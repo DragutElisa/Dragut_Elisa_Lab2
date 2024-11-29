@@ -9,9 +9,10 @@ using Dragut_Elisa_Lab2.Data;
 using Dragut_Elisa_Lab2.Models;
 using Microsoft.Identity.Client;
 
+
 namespace Dragut_Elisa_Lab2.Pages.Books
 {
-    public class CreateModel : PageModel
+    public class CreateModel : BookCategoriesPageModel
     {
         private readonly Dragut_Elisa_Lab2.Data.Dragut_Elisa_Lab2Context _context;
 
@@ -27,9 +28,12 @@ namespace Dragut_Elisa_Lab2.Pages.Books
 
             return Page();
         }
-        public IActionResult Create() {
+        public IActionResult  Create() {
             ViewData["AuthorID"] = new SelectList(_context.Set<Author>(), "ID",
 "AuthorFullName");
+            var book = new Book();
+            book.BookCategories = new List<BookCategory>();
+            PopulateAssignedCategoryData(_context, book);
 
             return Page();
 
@@ -37,19 +41,26 @@ namespace Dragut_Elisa_Lab2.Pages.Books
 
 
         [BindProperty]
-        public Book Book { get; set; } = default!;
+        public Book Book { get; set; } 
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string[] selectedCategories)
         {
-            if (!ModelState.IsValid)
+            var newBook = new Book();
+            if (selectedCategories != null)
             {
-                return Page();
+                newBook.BookCategories = new List<BookCategory>();
+                foreach (var cat in selectedCategories)
+                {
+                    var catToAdd = new BookCategory
+                    {
+                        CategoryID = int.Parse(cat)
+                    };
+                    newBook.BookCategories.Add(catToAdd);
+                }
             }
-
+            Book.BookCategories = newBook.BookCategories;
             _context.Book.Add(Book);
             await _context.SaveChangesAsync();
-
             return RedirectToPage("./Index");
         }
     }
