@@ -20,6 +20,14 @@ namespace Dragut_Elisa_Lab2.Pages.Books
         }
 
         public IList<Book> Book { get; set; } = default!;
+        public int BookID { get; set; }
+        public int CategoryID { get; set; }
+
+        public string TitleSort { get; set; }
+        public string AuthorSort
+        {
+            get; set;
+        }
 
         public async Task OnGetAsync()
         {
